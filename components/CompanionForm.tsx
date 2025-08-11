@@ -38,7 +38,14 @@ const formSchema = z.object({
 
 const CompanionForm = () => {
 
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<{
+        name: string;
+        subject: string;
+        topic: string;
+        voice: string;
+        style: string;
+        duration: unknown;
+    }>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
@@ -48,6 +55,7 @@ const CompanionForm = () => {
             style: '',
             duration: 15,
         },
+        mode: 'onChange',
     })
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -62,7 +70,7 @@ const CompanionForm = () => {
     }
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(values => onSubmit(values as z.infer<typeof formSchema>))}>
                 <FormField
                     control={form.control}
                     name="name"
@@ -191,9 +199,12 @@ const CompanionForm = () => {
                             <FormLabel>Estimated session duration in minutes</FormLabel>
                             <FormControl>
                                 <Input
+                                    value={field.value as number}
+                                    onChange={event => field.onChange(event)}
                                     type="number"
-                                    placeholder="15" {...field}
-                                    className="input" />
+                                    placeholder="15"
+                                    className="input"
+                                    />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
